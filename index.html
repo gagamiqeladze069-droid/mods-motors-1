@@ -1,193 +1,230 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mods Nation — 3D Car Lab</title>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@500;700;800;900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link rel="stylesheet" href="style.css" />
+    <title>AutoVerse | BMW M3 Competition</title>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-  </head>
-  <body>
-    <header class="top-nav">
-      <div class="nav-left">
-        <div class="logo" aria-label="Mods Nation Logo">
-          <span class="mods">mods</span>
-          <span class="nation">NATION</span>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            Auto<span>Verse</span>
         </div>
 
-        <nav class="main-links" aria-label="Main Navigation">
-          <button class="nav-btn active" id="btn-3d-lab"><i class="fa-solid fa-cube"></i> 3D Mods Lab</button>
-          <button class="nav-btn" id="btn-community"><i class="fa-solid fa-users"></i> Community</button>
-          <button class="nav-btn"><i class="fa-solid fa-newspaper"></i> Magazine</button>
-          <button class="nav-btn"><i class="fa-solid fa-store"></i> Marketplace</button>
+        <nav>
+            <a href="#home">მთავარი</a>
+            <a href="#cars">მანქანები</a>
+            <a href="#specs">მახასიათებლები</a>
         </nav>
-      </div>
 
-      <div class="nav-right">
-        <div class="select-brand-wrapper">
-          <select id="carModelSelect" class="custom-select" aria-label="Select Car Model">
-            <option value="ferrari">Ferrari 458 Italia</option>
-            <option value="porsche">Porsche 911 GT3 RS</option>
-            <option value="bmw">BMW M5 F10</option>
-            <option value="lamborghini">Lamborghini Huracan</option>
-            <option value="aston">Aston Martin Vantage</option>
-          </select>
-        </div>
-
-        <div class="cart-box" id="openCartBtn">
-          <span class="price-tag" id="totalPriceDisplay">$0</span>
-          <button class="cart-btn" aria-label="Open cart">
-            <i class="fa-solid fa-cart-shopping"></i>
-          </button>
-        </div>
-
-        <div class="user-profile">
-          <i class="fa-solid fa-bell icon-btn"></i>
-          <div class="avatar"><i class="fa-solid fa-user"></i></div>
-        </div>
-      </div>
+        <button class="menu-btn">MENU</button>
     </header>
 
-    <main class="app-container">
-      <section id="view-3d-lab" class="view-panel active">
-        <div id="canvas-container"></div>
 
-        <div id="loadingOverlay" class="loading-overlay">
-          <div class="spinner"></div>
-          <p>Loading high-detail 3D model...</p>
-        </div>
+    <main id="home">
 
-        <aside class="tuning-sidebar">
-          <div class="accordion-item active">
-            <button class="acc-header">
-              <span><i class="fa-solid fa-car"></i> Car Models</span>
-              <i class="fa-solid fa-chevron-right arrow"></i>
-            </button>
-            <div class="acc-content">
-              <div class="car-selector-grid" id="carSelectorGrid"></div>
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="tag">
+                    BMW M PERFORMANCE
+                </div>
+
+                <h1>
+                    BMW M3
+                    <span>COMPETITION</span>
+                </h1>
+
+                <p class="description">
+                    მაღალი წარმადობის სპორტული სედანი,
+                    შექმნილი სიჩქარისა და მართვისთვის.
+                </p>
+
+                <div class="buttons">
+
+                    <button id="startBtn" class="start-btn">
+                        <span class="power-icon">⏻</span>
+                        ENGINE START
+                    </button>
+
+                    <button id="lightsBtn" class="secondary-btn">
+                        LIGHTS
+                    </button>
+
+                </div>
+
+                <div id="engineStatus" class="status">
+                    ENGINE OFF
+                </div>
+
             </div>
-          </div>
 
-          <div class="accordion-item active">
-            <button class="acc-header">
-              <span><i class="fa-solid fa-fill-drip"></i> Paint & Finishes</span>
-              <i class="fa-solid fa-chevron-right arrow"></i>
-            </button>
-            <div class="acc-content">
-              <label class="control-label">Paint Finish Type</label>
-              <div class="btn-group" id="finishTypeGroup">
-                <button class="group-btn active" data-finish="metallic">Metallic</button>
-                <button class="group-btn" data-finish="matte">Matte</button>
-                <button class="group-btn" data-finish="gloss">Gloss</button>
-                <button class="group-btn" data-finish="chrome">Chrome</button>
-              </div>
 
-              <label class="control-label">Color Presets</label>
-              <div class="color-swatches">
-                <div class="swatch active" style="background:#d90429;" data-color="#d90429"></div>
-                <div class="swatch" style="background:#0a0a0a;" data-color="#0a0a0a"></div>
-                <div class="swatch" style="background:#555555;" data-color="#555555"></div>
-                <div class="swatch" style="background:#0066ff;" data-color="#0066ff"></div>
-                <div class="swatch" style="background:#38b000;" data-color="#38b000"></div>
-                <div class="swatch" style="background:#ffb703;" data-color="#ffb703"></div>
-                <div class="swatch" style="background:#ffffff;" data-color="#ffffff"></div>
-                <div class="swatch" style="background:#7209b7;" data-color="#7209b7"></div>
-              </div>
+            <div class="car-area">
 
-              <label class="control-label">Custom Color Picker</label>
-              <input type="color" id="customColorPicker" value="#d90429" class="color-picker-input" />
+                <div class="glow"></div>
+
+                <img
+                    id="carImage"
+                    class="car-image"
+                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/The%20frontview%20of%20BMW%20M3%20Competition%20M%20xDrive%20%28G80%29.jpg"
+                    alt="BMW M3 Competition G80"
+                >
+
+                <div class="rpm-box">
+
+                    <div class="rpm-title">
+                        RPM
+                    </div>
+
+                    <div id="rpm">
+                        0
+                    </div>
+
+                    <div class="rpm-line">
+                        <span id="rpmBar"></span>
+                    </div>
+
+                </div>
+
             </div>
-          </div>
 
-          <div class="accordion-item">
-            <button class="acc-header">
-              <span><i class="fa-solid fa-compact-disc"></i> Wheels & Rims</span>
-              <i class="fa-solid fa-chevron-right arrow"></i>
-            </button>
-            <div class="acc-content">
-              <label class="control-label">Rim Finish Color</label>
-              <div class="btn-group" id="rimColorGroup">
-                <button class="group-btn active" data-rimcolor="silver">Silver</button>
-                <button class="group-btn" data-rimcolor="gold">Gold</button>
-                <button class="group-btn" data-rimcolor="black">Black</button>
-              </div>
+        </section>
+
+
+        <section id="specs" class="spec-section">
+
+            <div class="section-title">
+
+                <span>01</span>
+
+                <h2>
+                    ENGINE
+                </h2>
+
             </div>
-          </div>
 
-          <div class="accordion-item">
-            <button class="acc-header">
-              <span><i class="fa-solid fa-bolt"></i> Neon & Lights</span>
-              <i class="fa-solid fa-chevron-right arrow"></i>
-            </button>
-            <div class="acc-content">
-              <div class="toggle-switch">
-                <span>Underglow Neon Kit</span>
-                <input type="checkbox" id="toggleUnderglow" />
-              </div>
-              <label class="control-label">Neon Color</label>
-              <input type="color" id="underglowPicker" value="#00e676" class="color-picker-input" />
+
+            <div class="spec-container">
+
+                <div class="engine-card">
+
+                    <div class="engine-label">
+                        POWER UNIT
+                    </div>
+
+                    <h3>
+                        3.0L
+                    </h3>
+
+                    <p>
+                        Twin-Turbo Inline-6
+                    </p>
+
+                    <div class="cylinders">
+                        <div class="cylinder-dot active"></div>
+                        <div class="cylinder-dot active"></div>
+                        <div class="cylinder-dot active"></div>
+                        <div class="cylinder-dot active"></div>
+                        <div class="cylinder-dot active"></div>
+                        <div class="cylinder-dot active"></div>
+                    </div>
+
+                    <strong>
+                        6 CYLINDERS
+                    </strong>
+
+                </div>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <span>POWER</span>
+                        <strong>503 HP</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>TORQUE</span>
+                        <strong>650 Nm</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>TRANSMISSION</span>
+                        <strong>8-SPEED</strong>
+                    </div>
+
+                    <div class="stat">
+                        <span>DRIVE</span>
+                        <strong>M xDRIVE</strong>
+                    </div>
+
+                </div>
+
             </div>
-          </div>
-        </aside>
 
-        <div class="hud-controls-right">
-          <button class="hud-btn engine-btn" id="btnEngineSound">
-            <i class="fa-solid fa-power-off"></i>
-            <span>ENGINE START</span>
-          </button>
-          <button class="hud-btn" id="btnResetView">
-            <i class="fa-solid fa-rotate-left"></i>
-            <span>RESET CAM</span>
-          </button>
-        </div>
+        </section>
 
-        <div class="hud-bottom-bar">
-          <span>Studio Preset:</span>
-          <button class="env-btn active" data-env="studio">Dark Studio</button>
-          <button class="env-btn" data-env="cyber">Cyber Neon</button>
-          <button class="env-btn" data-env="sunset">Showroom Day</button>
-        </div>
-      </section>
 
-      <section id="view-community" class="view-panel">
-        <div class="community-shell">
-          <div class="community-header">
-            <div class="tab-group">
-              <button class="subtab active">Spotlight</button>
-              <button class="subtab">Owner's Club</button>
-              <button class="subtab">What Mods Girls Drive</button>
+        <section id="cars" class="cars-section">
+
+            <div class="section-title">
+
+                <span>02</span>
+
+                <h2>
+                    SELECT CAR
+                </h2>
+
             </div>
-            <div class="header-actions">
-              <button class="red-action">+ Add Your Ride</button>
-              <button class="ghost-action">Explore All</button>
+
+
+            <div class="car-selector">
+
+                <button class="car-option active">
+                    BMW M3
+                    <small>COMPETITION</small>
+                </button>
+
+                <button class="car-option">
+                    BMW M4
+                    <small>COMING SOON</small>
+                </button>
+
+                <button class="car-option">
+                    BMW M5
+                    <small>COMING SOON</small>
+                </button>
+
             </div>
-          </div>
 
-          <div class="community-grid">
-            <div class="spotlight-grid" id="spotlightGrid"></div>
+        </section>
 
-            <aside class="render-rail">
-              <div class="render-list" id="renderList"></div>
-            </aside>
-          </div>
-        </div>
-      </section>
     </main>
 
+
+    <footer>
+
+        <p>
+            AutoVerse © 2026
+        </p>
+
+        <p>
+            BMW M3 Competition Experience
+        </p>
+
+    </footer>
+
+
     <script src="script.js"></script>
-  </body>
+
+</body>
 </html>
+```
