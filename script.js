@@ -1,41 +1,32 @@
-// --- MODS NATION - REALISTIC 3D CAR CONFIGURATOR ---
+// --- MODS NATION - HIGH-DETAIL PHOTOREALISTIC 3D CAR ENGINE ---
 
-// რეალური 3D ავტომობილების GLTF/GLB მოდელები
+// საიმედო CDN ბმულები მაღალი დეტალიზაციის 3D GLTF მოდელებისთვის
 const CAR_MODELS = {
+  ferrari: {
+    name: "Ferrari 458 Italia",
+    url: "https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Ferrari458/ferrari.glb"
+  },
   porsche: {
     name: "Porsche 911 GT3 RS",
-    url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Ferrari458/ferrari.glb"
-  },
-  mustang: {
-    name: "Ford Mustang Dark Horse",
-    url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Ferrari458/ferrari.glb"
-  },
-  m4: {
-    name: "BMW M4 Competition",
-    url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Ferrari458/ferrari.glb"
-  },
-  gtr: {
-    name: "Nissan GT-R Nismo",
-    url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Ferrari458/ferrari.glb"
+    url: "https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/models/gltf/Ferrari458/ferrari.glb"
   }
 };
 
 const appState = {
-  currentModel: 'porsche',
-  paintColor: 0x555555,
+  currentModel: 'ferrari',
+  paintColor: 0xd90429,
   paintFinish: 'metallic',
-  rimColor: 0xdddddd,
-  rimsPrice: 0,
-  wingPrice: 0,
+  rimColor: 'silver',
   underglow: false,
   underglowColor: 0x00e676,
   engineRunning: false
 };
 
 let scene, camera, renderer, controls, gltfLoader;
-let currentCarModel = null;
+let currentCarGroup = null;
 let carBodyMeshes = [];
 let rimMeshes = [];
+let glassMeshes = [];
 let underglowLight = null;
 
 function init3D() {
@@ -43,33 +34,33 @@ function init3D() {
 
   // Scene
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0b0d);
-  scene.fog = new THREE.FogExp2(0x0a0b0d, 0.012);
+  scene.background = new THREE.Color(0x0b0c0f);
+  scene.fog = new THREE.FogExp2(0x0b0c0f, 0.012);
 
   // Camera
-  camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-  camera.position.set(4.2, 1.6, 4.5);
+  camera = new THREE.PerspectiveCamera(40, container.clientWidth / container.clientHeight, 0.1, 100);
+  camera.position.set(4.2, 1.4, 4.5);
 
-  // Renderer
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  // WebGL Renderer with High Precision Shadow & ACES Tone Mapping
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.1;
   container.appendChild(renderer.domElement);
 
   // Orbit Controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
-  controls.maxPolarAngle = Math.PI / 2 - 0.02;
-  controls.minDistance = 2.0;
+  controls.maxPolarAngle = Math.PI / 2 - 0.01;
+  controls.minDistance = 2.2;
   controls.maxDistance = 8.0;
 
-  // GLTF Loader
+  // Loader
   gltfLoader = new THREE.GLTFLoader();
 
   setupStudioEnvironment();
@@ -79,125 +70,146 @@ function init3D() {
   window.addEventListener('resize', onWindowResize);
 }
 
+// სტუდიური განათება და ირეკვლის გენერატორი (Softbox Lighting)
 function setupStudioEnvironment() {
-  // Ambient Soft Light
-  const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+  const ambient = new THREE.AmbientLight(0xffffff, 1.2);
   scene.add(ambient);
 
-  // Directional Shadow Light
-  const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
-  keyLight.position.set(5, 8, 5);
-  keyLight.castShadow = true;
-  keyLight.shadow.mapSize.width = 2048;
-  keyLight.shadow.mapSize.height = 2048;
-  scene.add(keyLight);
+  // Main Top Softbox Light
+  const mainLight = new THREE.DirectionalLight(0xffffff, 2.8);
+  mainLight.position.set(2, 8, 4);
+  mainLight.castShadow = true;
+  mainLight.shadow.mapSize.width = 2048;
+  mainLight.shadow.mapSize.height = 2048;
+  mainLight.shadow.bias = -0.0001;
+  scene.add(mainLight);
 
-  // Fill Light (Cyber Blue Side Highlight)
-  const fillLight = new THREE.DirectionalLight(0x3a86ff, 1.2);
-  fillLight.position.set(-6, 4, -5);
-  scene.add(fillLight);
+  // Cyber Blue Side Rim Light
+  const rimLight = new THREE.DirectionalLight(0x3a86ff, 1.5);
+  rimLight.position.set(-6, 3, -4);
+  scene.add(rimLight);
 
-  // Reflective Metallic Studio Floor
-  const floorGeo = new THREE.PlaneGeometry(50, 50);
+  // Top Light Panel (Softbox Mesh Reflection)
+  const softboxGeo = new THREE.PlaneGeometry(8, 8);
+  const softboxMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+  const softbox = new THREE.Mesh(softboxGeo, softboxMat);
+  softbox.position.set(0, 6, 0);
+  softbox.rotation.x = Math.PI / 2;
+  scene.add(softbox);
+
+  // Studio Mirror Floor
+  const floorGeo = new THREE.PlaneGeometry(60, 60);
   const floorMat = new THREE.MeshStandardMaterial({
-    color: 0x0e1014,
-    roughness: 0.15,
-    metalness: 0.85
+    color: 0x0f1115,
+    roughness: 0.2,
+    metalness: 0.8
   });
   const floor = new THREE.Mesh(floorGeo, floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.receiveShadow = true;
   scene.add(floor);
 
-  // Floor Grid
-  const grid = new THREE.GridHelper(50, 50, 0xe63946, 0x222630);
+  // Grid floor pattern
+  const grid = new THREE.GridHelper(60, 60, 0xe63946, 0x1f232d);
   grid.position.y = 0.005;
   scene.add(grid);
 
-  // Neon Underglow Light
-  underglowLight = new THREE.PointLight(appState.underglowColor, 0, 6);
+  // Underglow Point Light
+  underglowLight = new THREE.PointLight(appState.underglowColor, 0, 5);
   underglowLight.position.set(0, 0.15, 0);
   scene.add(underglowLight);
 }
 
-// რეალური 3D GLTF მოდელის ჩატვირთვა
+// 3D GLTF მოდელის ჩატვირთვა
 function loadCarModel(modelKey) {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) overlay.classList.remove('hidden');
+
   const modelInfo = CAR_MODELS[modelKey];
   if (!modelInfo) return;
 
-  if (currentCarModel) {
-    scene.remove(currentCarModel);
-    currentCarModel = null;
+  if (currentCarGroup) {
+    scene.remove(currentCarGroup);
+    currentCarGroup = null;
   }
 
   carBodyMeshes = [];
   rimMeshes = [];
+  glassMeshes = [];
 
   gltfLoader.load(
     modelInfo.url,
     (gltf) => {
-      currentCarModel = gltf.scene;
+      currentCarGroup = gltf.scene;
 
-      // მოდელის ზომის და პოზიციის ავტომატური კორექტირება
-      const box = new THREE.Box3().setFromObject(currentCarModel);
+      // ზომისა და პოზიციის ავტომატური ცენტრირება
+      const box = new THREE.Box3().setFromObject(currentCarGroup);
       const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = 4.2 / maxDim;
-      currentCarModel.scale.set(scale, scale, scale);
+      currentCarGroup.scale.set(scale, scale, scale);
 
-      box.setFromObject(currentCarModel);
-      currentCarModel.position.x = -box.getCenter(new THREE.Vector3()).x;
-      currentCarModel.position.y = -box.min.y;
-      currentCarModel.position.z = -box.getCenter(new THREE.Vector3()).z;
+      box.setFromObject(currentCarGroup);
+      currentCarGroup.position.x = -box.getCenter(new THREE.Vector3()).x;
+      currentCarGroup.position.y = -box.min.y;
+      currentCarGroup.position.z = -box.getCenter(new THREE.Vector3()).z;
 
-      // 3D მოდელის დეტალებისა და მასალების დამუშავება
-      currentCarModel.traverse((child) => {
+      // 3D ნაწილების დამუშავება და PBR მასალები
+      currentCarGroup.traverse((child) => {
         if (child.isMesh) {
           child.castShadow = true;
           child.receiveShadow = true;
 
-          const matName = child.material.name ? child.material.name.toLowerCase() : '';
-          const meshName = child.name ? child.name.toLowerCase() : '';
+          const name = (child.name || '').toLowerCase();
+          const matName = (child.material && child.material.name) ? child.material.name.toLowerCase() : '';
 
-          // ავტომობილის კორპუსის საღებავის PBR მასალით ჩანაცვლება
-          if (matName.includes('body') || matName.includes('paint') || matName.includes('car_body') || matName.includes('red') || meshName.includes('body')) {
+          // კორპუსის საღებავი (Body Paint)
+          if (name.includes('body') || matName.includes('body') || matName.includes('paint') || matName.includes('car_body')) {
             child.material = getRealisticCarPaintMaterial();
             carBodyMeshes.push(child);
-          } else if (matName.includes('glass') || meshName.includes('glass')) {
+          }
+          // დისკები (Rims)
+          else if (name.includes('rim') || matName.includes('rim') || name.includes('wheel') || matName.includes('wheel')) {
+            rimMeshes.push(child);
+          }
+          // შუშა (Glass)
+          else if (name.includes('glass') || matName.includes('glass')) {
             child.material = new THREE.MeshPhysicalMaterial({
               color: 0x111111,
               metalness: 0.1,
-              roughness: 0.05,
-              transmission: 0.85,
-              opacity: 0.8,
-              transparent: true
+              roughness: 0.0,
+              transmission: 0.9,
+              transparent: true,
+              opacity: 0.85
             });
-          } else if (matName.includes('rim') || matName.includes('wheel') || meshName.includes('rim')) {
-            rimMeshes.push(child);
+            glassMeshes.push(child);
           }
         }
       });
 
-      scene.add(currentCarModel);
-      controls.target.set(0, 0.6, 0);
+      scene.add(currentCarGroup);
+      controls.target.set(0, 0.5, 0);
+
+      if (overlay) overlay.classList.add('hidden');
     },
     undefined,
-    (error) => {
-      console.error('Error loading 3D GLTF model:', error);
+    (err) => {
+      console.error('Error loading 3D model:', err);
+      if (overlay) overlay.classList.add('hidden');
     }
   );
 }
 
-// რეალისტური ლაქ-საღებავის მასალა (Clearcoat & Metallic)
+// რეალისტური Clearcoat & Metallic ლაქ-საღებავის მასალა
 function getRealisticCarPaintMaterial() {
-  let roughness = 0.15;
+  let roughness = 0.12;
   let metalness = 0.85;
   let clearcoat = 1.0;
   let clearcoatRoughness = 0.03;
 
   if (appState.paintFinish === 'matte') {
-    roughness = 0.75;
-    metalness = 0.2;
+    roughness = 0.8;
+    metalness = 0.1;
     clearcoat = 0.0;
   } else if (appState.paintFinish === 'chrome') {
     roughness = 0.02;
@@ -205,7 +217,7 @@ function getRealisticCarPaintMaterial() {
     clearcoat = 1.0;
   } else if (appState.paintFinish === 'gloss') {
     roughness = 0.05;
-    metalness = 0.3;
+    metalness = 0.2;
     clearcoat = 1.0;
   }
 
@@ -215,7 +227,7 @@ function getRealisticCarPaintMaterial() {
     roughness: roughness,
     clearcoat: clearcoat,
     clearcoatRoughness: clearcoatRoughness,
-    reflectivity: 1.0
+    reflectivity: 0.9
   });
 }
 
@@ -225,12 +237,26 @@ function updatePaintColor() {
   });
 }
 
+function updateRimColor() {
+  let color = 0xdddddd;
+  if (appState.rimColor === 'gold') color = 0xffd700;
+  if (appState.rimColor === 'black') color = 0x111111;
+
+  rimMeshes.forEach(mesh => {
+    if (mesh.material) {
+      mesh.material.color.setHex(color);
+      mesh.material.metalness = 0.95;
+      mesh.material.roughness = 0.1;
+    }
+  });
+}
+
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
 
-  if (appState.engineRunning && currentCarModel) {
-    currentCarModel.position.y = (Math.sin(Date.now() * 0.08) * 0.002);
+  if (appState.engineRunning && currentCarGroup) {
+    currentCarGroup.position.y = (Math.sin(Date.now() * 0.08) * 0.002);
   }
 
   renderer.render(scene, camera);
@@ -243,7 +269,7 @@ function onWindowResize() {
   renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
-// UI EVENTS
+// UI EVENTS SETUP
 function setupUI() {
   document.querySelectorAll('.acc-header').forEach(header => {
     header.addEventListener('click', () => {
@@ -254,7 +280,7 @@ function setupUI() {
   document.getElementById('btn-3d-lab').addEventListener('click', () => switchView('view-3d-lab'));
   document.getElementById('btn-community').addEventListener('click', () => switchView('view-community'));
 
-  // Car model selection
+  // Car Selection
   document.querySelectorAll('.car-card').forEach(card => {
     card.addEventListener('click', () => {
       document.querySelectorAll('.car-card').forEach(c => c.classList.remove('active'));
@@ -271,7 +297,7 @@ function setupUI() {
     loadCarModel(modelKey);
   });
 
-  // Color Swatches
+  // Colors
   document.querySelectorAll('.swatch').forEach(swatch => {
     swatch.addEventListener('click', () => {
       document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
@@ -286,7 +312,7 @@ function setupUI() {
     updatePaintColor();
   });
 
-  // Finish Types
+  // Finishes
   document.querySelectorAll('#finishTypeGroup .group-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#finishTypeGroup .group-btn').forEach(b => b.classList.remove('active'));
@@ -296,25 +322,20 @@ function setupUI() {
     });
   });
 
-  // Wheels Rims
-  document.querySelectorAll('[data-rim]').forEach(card => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('[data-rim]').forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-      appState.rimsPrice = parseInt(card.dataset.price);
-
-      const color = card.dataset.rim === 'bbs' ? 0xffd700 : 0xdddddd;
-      rimMeshes.forEach(mesh => {
-        if (mesh.material) mesh.material.color.setHex(color);
-      });
-      updateTotalPrice();
+  // Rim Finish
+  document.querySelectorAll('#rimColorGroup .group-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#rimColorGroup .group-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      appState.rimColor = btn.dataset.rimcolor;
+      updateRimColor();
     });
   });
 
-  // Neon Underglow
+  // Underglow
   document.getElementById('toggleUnderglow').addEventListener('change', (e) => {
     appState.underglow = e.target.checked;
-    underglowLight.intensity = appState.underglow ? 5 : 0;
+    underglowLight.intensity = appState.underglow ? 4 : 0;
   });
 
   document.getElementById('underglowPicker').addEventListener('input', (e) => {
@@ -331,13 +352,9 @@ function setupUI() {
   });
 
   document.getElementById('btnResetView').addEventListener('click', () => {
-    camera.position.set(4.2, 1.6, 4.5);
-    controls.target.set(0, 0.6, 0);
+    camera.position.set(4.2, 1.4, 4.5);
+    controls.target.set(0, 0.5, 0);
   });
-
-  document.getElementById('openCartBtn').addEventListener('click', openCartModal);
-  document.getElementById('closeCartBtn').addEventListener('click', closeCartModal);
-  document.getElementById('closeCartBtn2').addEventListener('click', closeCartModal);
 }
 
 function switchView(viewId) {
@@ -346,31 +363,6 @@ function switchView(viewId) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   if (viewId === 'view-3d-lab') document.getElementById('btn-3d-lab').classList.add('active');
   if (viewId === 'view-community') document.getElementById('btn-community').classList.add('active');
-}
-
-function updateTotalPrice() {
-  let total = appState.wingPrice + appState.rimsPrice;
-  document.getElementById('totalPriceDisplay').innerText = `$${total.toLocaleString()}`;
-}
-
-function openCartModal() {
-  const itemsList = document.getElementById('cartItemsList');
-  itemsList.innerHTML = '';
-  let total = appState.wingPrice + appState.rimsPrice;
-
-  if (appState.rimsPrice > 0) {
-    itemsList.innerHTML += `<li><span>Forged Alloy Rims</span> <strong>+$${appState.rimsPrice.toLocaleString()}</strong></li>`;
-  }
-  if (total === 0) {
-    itemsList.innerHTML = '<li style="color:#8d95a1;">No extra mods selected.</li>';
-  }
-
-  document.getElementById('modalTotalPrice').innerText = `$${total.toLocaleString()}`;
-  document.getElementById('cartModal').classList.add('active');
-}
-
-function closeCartModal() {
-  document.getElementById('cartModal').classList.remove('active');
 }
 
 window.addEventListener('DOMContentLoaded', () => {
