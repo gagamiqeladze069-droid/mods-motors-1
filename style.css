@@ -25,3 +25,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 input[type=color]{width:36px;height:30px;border:0;background:none;padding:0}
 .lab{font-size:13px;color:var(--mute);margin-top:10px}
 @media(max-width:760px){.app{grid-template-columns:1fr;grid-template-rows:1fr 48%}.panel{border-left:0;border-top:1px solid var(--line)}}
+.views{position:absolute;right:16px;top:14px;display:flex;gap:6px}
+.views button{background:#21262d;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 10px;font:inherit;font-size:12px;cursor:pointer}
+.views button:hover{border-color:var(--acc)}
+input[type=text]{width:100%;background:#21262d;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font:inherit;text-transform:uppercase;letter-spacing:.08em}
