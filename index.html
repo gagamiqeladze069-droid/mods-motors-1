@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mods Nation - Realistic 3D Car Configurator</title>
+  <title>Mods Nation - Photorealistic 3D Car Configurator</title>
   
-  <!-- Font Awesome Icons & Google Fonts -->
+  <!-- Icons & Fonts -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
-  <!-- Three.js Library, OrbitControls & GLTFLoader -->
+  <!-- Three.js Library, Controls, GLTF Loader & DRACO Loader -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
 </head>
 <body>
 
@@ -35,11 +36,8 @@
     <div class="nav-right">
       <div class="select-brand-wrapper">
         <select id="carModelSelect" class="custom-select">
+          <option value="ferrari">Ferrari 458 Italia</option>
           <option value="porsche">Porsche 911 GT3 RS</option>
-          <option value="mustang">Ford Mustang Dark Horse</option>
-          <option value="m4">BMW M4 Competition</option>
-          <option value="gtr">Nissan GT-R Nismo</option>
-          <option value="golf">Volkswagen Golf R</option>
         </select>
       </div>
 
@@ -58,9 +56,15 @@
   <!-- MAIN APP CONTAINER -->
   <main class="app-container">
 
-    <!-- 1. 3D CONFIGURATOR VIEW -->
+    <!-- 3D LAB VIEW -->
     <section id="view-3d-lab" class="view-panel active">
       <div id="canvas-container"></div>
+
+      <!-- Loading Screen Overlay -->
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>მაღალი ხარისხის 3D მოდელი იტვირთება...</p>
+      </div>
 
       <!-- Left Sidebar Controls -->
       <aside class="tuning-sidebar">
@@ -73,28 +77,20 @@
           </button>
           <div class="acc-content">
             <div class="car-selector-grid">
-              <div class="car-card active" data-model="porsche">
+              <div class="car-card active" data-model="ferrari">
+                <img src="https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=200&auto=format&fit=crop" alt="Ferrari">
+                <span>Ferrari 458</span>
+              </div>
+              <div class="car-card" data-model="porsche">
                 <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=200&auto=format&fit=crop" alt="Porsche">
-                <span>Porsche 911 GT3</span>
-              </div>
-              <div class="car-card" data-model="mustang">
-                <img src="https://images.unsplash.com/photo-1584345604476-8ec5e12e42dd?w=200&auto=format&fit=crop" alt="Mustang">
-                <span>Mustang Dark Horse</span>
-              </div>
-              <div class="car-card" data-model="m4">
-                <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=200&auto=format&fit=crop" alt="BMW M4">
-                <span>BMW M4 Comp</span>
-              </div>
-              <div class="car-card" data-model="gtr">
-                <img src="https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=200&auto=format&fit=crop" alt="GT-R">
-                <span>Nissan GT-R Nismo</span>
+                <span>Porsche GT3</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Paint & Wraps -->
-        <div class="accordion-item">
+        <!-- Paint & Finishes -->
+        <div class="accordion-item active">
           <button class="acc-header">
             <span><i class="fa-solid fa-fill-drip"></i> Paint & Finishes</span>
             <i class="fa-solid fa-chevron-right arrow"></i>
@@ -110,81 +106,41 @@
 
             <label class="control-label">Color Presets</label>
             <div class="color-swatches">
-              <div class="swatch active" style="background:#555555;" data-color="#555555" data-name="Nardo Gray"></div>
-              <div class="swatch" style="background:#d90429;" data-color="#d90429" data-name="Rosso Red"></div>
-              <div class="swatch" style="background:#0a0a0a;" data-color="#0a0a0a" data-name="Midnight Black"></div>
-              <div class="swatch" style="background:#0066ff;" data-color="#0066ff" data-name="Miami Blue"></div>
-              <div class="swatch" style="background:#38b000;" data-color="#38b000" data-name="Acid Green"></div>
-              <div class="swatch" style="background:#ffb703;" data-color="#ffb703" data-name="Sunburst Yellow"></div>
-              <div class="swatch" style="background:#ffffff;" data-color="#ffffff" data-name="Pure White"></div>
-              <div class="swatch" style="background:#7209b7;" data-color="#7209b7" data-name="Ultra Violet"></div>
+              <div class="swatch active" style="background:#d90429;" data-color="#d90429"></div>
+              <div class="swatch" style="background:#0a0a0a;" data-color="#0a0a0a"></div>
+              <div class="swatch" style="background:#555555;" data-color="#555555"></div>
+              <div class="swatch" style="background:#0066ff;" data-color="#0066ff"></div>
+              <div class="swatch" style="background:#38b000;" data-color="#38b000"></div>
+              <div class="swatch" style="background:#ffb703;" data-color="#ffb703"></div>
+              <div class="swatch" style="background:#ffffff;" data-color="#ffffff"></div>
+              <div class="swatch" style="background:#7209b7;" data-color="#7209b7"></div>
             </div>
 
             <label class="control-label">Custom Color Picker</label>
-            <input type="color" id="customColorPicker" value="#555555" class="color-picker-input">
+            <input type="color" id="customColorPicker" value="#d90429" class="color-picker-input">
           </div>
         </div>
 
-        <!-- Aerodynamics & Mods -->
+        <!-- Wheels & Rims -->
         <div class="accordion-item">
           <button class="acc-header">
-            <span><i class="fa-solid fa-shield-halved"></i> Aero & Body Kit</span>
+            <span><i class="fa-solid fa-compact-disc"></i> Wheels & Rims</span>
             <i class="fa-solid fa-chevron-right arrow"></i>
           </button>
           <div class="acc-content">
-            <label class="control-label">GT Rear Wings</label>
-            <div class="mod-option-list">
-              <div class="mod-card active" data-wing="stock" data-price="0">
-                <span>Stock Spoiler</span>
-                <span class="price">Free</span>
-              </div>
-              <div class="mod-card" data-wing="carbon-gt" data-price="2450">
-                <span>Carbon Fiber GT Wing</span>
-                <span class="price">+$2,450</span>
-              </div>
+            <label class="control-label">Rim Finish Color</label>
+            <div class="btn-group" id="rimColorGroup">
+              <button class="group-btn active" data-rimcolor="silver">Silver</button>
+              <button class="group-btn" data-rimcolor="gold">Gold</button>
+              <button class="group-btn" data-rimcolor="black">Black</button>
             </div>
-
-            <label class="control-label">Window Tint</label>
-            <input type="range" id="tintRange" min="10" max="95" value="70" class="slider">
           </div>
         </div>
 
-        <!-- Wheels & Suspension -->
+        <!-- Underglow & Neon -->
         <div class="accordion-item">
           <button class="acc-header">
-            <span><i class="fa-solid fa-compact-disc"></i> Wheels & Stance</span>
-            <i class="fa-solid fa-chevron-right arrow"></i>
-          </button>
-          <div class="acc-content">
-            <label class="control-label">Wheel Rim Style</label>
-            <div class="mod-option-list">
-              <div class="mod-card active" data-rim="stock" data-price="0">
-                <span>OEM Sports Wheels</span>
-                <span class="price">Free</span>
-              </div>
-              <div class="mod-card" data-rim="bbs" data-price="3800">
-                <span>BBS Gold Forged Rims</span>
-                <span class="price">+$3,800</span>
-              </div>
-            </div>
-
-            <label class="control-label">Brake Caliper Color</label>
-            <div class="caliper-colors">
-              <span class="caliper-dot active" style="background:#ff0000;" data-caliper="#ff0000"></span>
-              <span class="caliper-dot" style="background:#ffaa00;" data-caliper="#ffaa00"></span>
-              <span class="caliper-dot" style="background:#00e676;" data-caliper="#00e676"></span>
-              <span class="caliper-dot" style="background:#0088ff;" data-caliper="#0088ff"></span>
-            </div>
-
-            <label class="control-label">Suspension Stance (Drop)</label>
-            <input type="range" id="stanceRange" min="0" max="100" value="20" class="slider">
-          </div>
-        </div>
-
-        <!-- Neon & Lighting -->
-        <div class="accordion-item">
-          <button class="acc-header">
-            <span><i class="fa-solid fa-bolt"></i> Neon & Lighting</span>
+            <span><i class="fa-solid fa-bolt"></i> Neon & Lights</span>
             <i class="fa-solid fa-chevron-right arrow"></i>
           </button>
           <div class="acc-content">
@@ -192,7 +148,7 @@
               <span>Underglow Neon Kit</span>
               <input type="checkbox" id="toggleUnderglow">
             </div>
-            <label class="control-label">Underglow Color</label>
+            <label class="control-label">Neon Color</label>
             <input type="color" id="underglowPicker" value="#00e676" class="color-picker-input">
           </div>
         </div>
@@ -200,10 +156,6 @@
 
       <!-- HUD Controls -->
       <div class="hud-controls-right">
-        <button class="hud-btn" id="btnToggleLights">
-          <i class="fa-solid fa-lightbulb"></i>
-          <span>LIGHTS</span>
-        </button>
         <button class="hud-btn engine-btn" id="btnEngineSound">
           <i class="fa-solid fa-power-off"></i>
           <span>ENGINE START</span>
@@ -214,25 +166,23 @@
         </button>
       </div>
 
-      <!-- Environment Lighting -->
+      <!-- Studio Presets Bar -->
       <div class="hud-bottom-bar">
-        <span>Studio Lighting:</span>
-        <button class="env-btn active" data-env="dark">Dark Studio</button>
+        <span>Studio Preset:</span>
+        <button class="env-btn active" data-env="studio">Dark Studio</button>
         <button class="env-btn" data-env="cyber">Cyber Neon</button>
-        <button class="env-btn" data-env="sunset">Sunset Showroom</button>
+        <button class="env-btn" data-env="sunset">Showroom Day</button>
       </div>
     </section>
 
-    <!-- 2. COMMUNITY HUB VIEW -->
+    <!-- COMMUNITY HUB VIEW -->
     <section id="view-community" class="view-panel">
       <div class="community-header">
         <div class="tab-filters">
           <button class="subtab active">Spotlight</button>
           <button class="subtab">Owner's Club</button>
         </div>
-        <button class="btn-primary" id="btnOpenAddRide"><i class="fa-solid fa-plus"></i> + ADD YOUR RIDE</button>
       </div>
-
       <div class="cards-grid">
         <div class="car-post-card">
           <div class="card-img-wrapper">
@@ -244,7 +194,6 @@
             <span class="author">Ashley Taylor</span>
             <h3 class="build-title">Ashley's Grey Area - M5 F10</h3>
             <p class="specs">2021 • 5x112 • Satin Grey</p>
-            <button class="btn-secondary build-in-3d-btn" data-preset="m4"><i class="fa-solid fa-cube"></i> Build in 3D</button>
           </div>
         </div>
 
@@ -258,33 +207,11 @@
             <span class="author">Vladislav Luzin</span>
             <h3 class="build-title">911 GT3 RS Track Edition</h3>
             <p class="specs">2023 • Centerlock • Acid Green</p>
-            <button class="btn-secondary build-in-3d-btn" data-preset="porsche"><i class="fa-solid fa-cube"></i> Build in 3D</button>
           </div>
         </div>
       </div>
     </section>
   </main>
-
-  <!-- CART MODAL -->
-  <div class="modal-overlay" id="cartModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Customization Build Summary</h2>
-        <button class="close-modal" id="closeCartBtn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <ul id="cartItemsList" class="cart-items-list"></ul>
-        <div class="cart-summary-total">
-          <span>Total Mods Price:</span>
-          <span class="total-price-large" id="modalTotalPrice">$0</span>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" id="closeCartBtn2">Back to Studio</button>
-        <button class="btn-primary">Checkout Order</button>
-      </div>
-    </div>
-  </div>
 
   <script src="script.js"></script>
 </body>
