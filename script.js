@@ -1,55 +1,59 @@
-// --- CAR MODELS GLTF DATA & APP STATE ---
-const CAR_DATA = {
+// --- MODS NATION - REALISTIC 3D CAR CONFIGURATOR ---
+
+// რეალური 3D ავტომობილების GLTF/GLB მოდელები
+const CAR_MODELS = {
   porsche: {
     name: "Porsche 911 GT3 RS",
-    url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BugattiAttire/glTF-Binary/BugattiAttire.glb"
+    url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Ferrari458/ferrari.glb"
   },
   mustang: {
     name: "Ford Mustang Dark Horse",
-    url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/ToyCar/glTF-Binary/ToyCar.glb"
+    url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Ferrari458/ferrari.glb"
   },
   m4: {
     name: "BMW M4 Competition",
-    url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb"
+    url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Ferrari458/ferrari.glb"
   },
   gtr: {
     name: "Nissan GT-R Nismo",
-    url: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/MaterialsVariantsShoe/glTF-Binary/MaterialsVariantsShoe.glb"
+    url: "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Ferrari458/ferrari.glb"
   }
 };
 
 const appState = {
   currentModel: 'porsche',
-  paintColor: '#555555',
+  paintColor: 0x555555,
   paintFinish: 'metallic',
-  wing: 'stock',
-  wingPrice: 0,
-  rims: 'stock',
+  rimColor: 0xdddddd,
   rimsPrice: 0,
-  caliperColor: '#ff0000',
+  wingPrice: 0,
   underglow: false,
-  underglowColor: '#00e676',
-  lightsOn: true,
+  underglowColor: 0x00e676,
   engineRunning: false
 };
 
 let scene, camera, renderer, controls, gltfLoader;
-let currentCarGroup, carBodyMaterials = [], rimMaterials = [], caliperMaterials = [];
-let underglowLight, headLights = [];
+let currentCarModel = null;
+let carBodyMeshes = [];
+let rimMeshes = [];
+let underglowLight = null;
 
 function init3D() {
   const container = document.getElementById('canvas-container');
 
+  // Scene
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x0a0b0d);
-  scene.fog = new THREE.FogExp2(0x0a0b0d, 0.02);
+  scene.fog = new THREE.FogExp2(0x0a0b0d, 0.012);
 
+  // Camera
   camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-  camera.position.set(4, 1.8, 4.5);
+  camera.position.set(4.2, 1.6, 4.5);
 
+  // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputEncoding = THREE.sRGBEncoding;
@@ -57,41 +61,46 @@ function init3D() {
   renderer.toneMappingExposure = 1.2;
   container.appendChild(renderer.domElement);
 
+  // Orbit Controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
-  controls.maxPolarAngle = Math.PI / 2 - 0.01;
-  controls.minDistance = 2.5;
-  controls.maxDistance = 10;
+  controls.maxPolarAngle = Math.PI / 2 - 0.02;
+  controls.minDistance = 2.0;
+  controls.maxDistance = 8.0;
 
+  // GLTF Loader
   gltfLoader = new THREE.GLTFLoader();
 
   setupStudioEnvironment();
-  buildProceduralRealisticCar();
+  loadCarModel(appState.currentModel);
   animate();
 
   window.addEventListener('resize', onWindowResize);
 }
 
 function setupStudioEnvironment() {
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
-  scene.add(ambientLight);
+  // Ambient Soft Light
+  const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+  scene.add(ambient);
 
-  const mainLight = new THREE.DirectionalLight(0xffffff, 2.0);
-  mainLight.position.set(5, 8, 5);
-  mainLight.castShadow = true;
-  mainLight.shadow.mapSize.width = 2048;
-  mainLight.shadow.mapSize.height = 2048;
-  scene.add(mainLight);
+  // Directional Shadow Light
+  const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+  keyLight.position.set(5, 8, 5);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.width = 2048;
+  keyLight.shadow.mapSize.height = 2048;
+  scene.add(keyLight);
 
-  const fillLight = new THREE.DirectionalLight(0x0088ff, 0.5);
-  fillLight.position.set(-5, 3, -5);
+  // Fill Light (Cyber Blue Side Highlight)
+  const fillLight = new THREE.DirectionalLight(0x3a86ff, 1.2);
+  fillLight.position.set(-6, 4, -5);
   scene.add(fillLight);
 
   // Reflective Metallic Studio Floor
-  const floorGeo = new THREE.PlaneGeometry(30, 30);
+  const floorGeo = new THREE.PlaneGeometry(50, 50);
   const floorMat = new THREE.MeshStandardMaterial({
-    color: 0x111317,
+    color: 0x0e1014,
     roughness: 0.15,
     metalness: 0.85
   });
@@ -100,150 +109,119 @@ function setupStudioEnvironment() {
   floor.receiveShadow = true;
   scene.add(floor);
 
-  const grid = new THREE.GridHelper(30, 30, 0xe63946, 0x222630);
-  grid.position.y = 0.01;
+  // Floor Grid
+  const grid = new THREE.GridHelper(50, 50, 0xe63946, 0x222630);
+  grid.position.y = 0.005;
   scene.add(grid);
+
+  // Neon Underglow Light
+  underglowLight = new THREE.PointLight(appState.underglowColor, 0, 6);
+  underglowLight.position.set(0, 0.15, 0);
+  scene.add(underglowLight);
 }
 
-// REALISTIC CAR MESH GENERATOR (PROPORTIONAL AUTOMOTIVE SHAPES)
-function buildProceduralRealisticCar() {
-  if (currentCarGroup) scene.remove(currentCarGroup);
+// რეალური 3D GLTF მოდელის ჩატვირთვა
+function loadCarModel(modelKey) {
+  const modelInfo = CAR_MODELS[modelKey];
+  if (!modelInfo) return;
 
-  currentCarGroup = new THREE.Group();
-  carBodyMaterials = [];
-  rimMaterials = [];
-  caliperMaterials = [];
-  headLights = [];
-
-  // Realistic Car Paint Material
-  const bodyMat = getRealisticPaintMaterial();
-  carBodyMaterials.push(bodyMat);
-
-  // Smooth Aerodynamic Car Body Frame
-  const bodyShape = new THREE.Shape();
-  bodyShape.moveTo(-2.0, 0.3);
-  bodyShape.lineTo(-1.8, 0.55);
-  bodyShape.lineTo(-0.8, 0.65);
-  bodyShape.lineTo(-0.3, 1.25);
-  bodyShape.lineTo(0.8, 1.25);
-  bodyShape.lineTo(1.5, 0.7);
-  bodyShape.lineTo(2.0, 0.6);
-  bodyShape.lineTo(2.1, 0.3);
-  bodyShape.lineTo(-2.0, 0.3);
-
-  const extrudeSettings = {
-    steps: 2,
-    depth: 1.6,
-    bevelEnabled: true,
-    bevelThickness: 0.15,
-    bevelSize: 0.15,
-    bevelSegments: 5
-  };
-
-  const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, extrudeSettings);
-  bodyGeo.center();
-  const carBody = new THREE.Mesh(bodyGeo, bodyMat);
-  carBody.position.y = 0.65;
-  carBody.castShadow = true;
-  carBody.receiveShadow = true;
-  currentCarGroup.add(carBody);
-
-  // Tinted Glass Canopy
-  const glassGeo = new THREE.BoxGeometry(1.4, 0.5, 1.45);
-  const glassMat = new THREE.MeshPhysicalMaterial({
-    color: 0x050505,
-    metalness: 0.9,
-    roughness: 0.1,
-    transmission: 0.8,
-    transparent: true,
-    opacity: 0.85
-  });
-  const glass = new THREE.Mesh(glassGeo, glassMat);
-  glass.position.set(0.1, 1.1, 0);
-  currentCarGroup.add(glass);
-
-  // Realistic Wheels & Alloy Rims
-  const wheelPositions = [
-    [-1.2, 0.4, 0.85],
-    [1.2, 0.4, 0.85],
-    [-1.2, 0.4, -0.85],
-    [1.2, 0.4, -0.85]
-  ];
-
-  wheelPositions.forEach(pos => {
-    const wheelGroup = new THREE.Group();
-    wheelGroup.position.set(...pos);
-
-    // Rubber Tire
-    const tireGeo = new THREE.TorusGeometry(0.32, 0.12, 16, 32);
-    const tireMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
-    const tire = new THREE.Mesh(tireGeo, tireMat);
-    tire.rotation.x = Math.PI / 2;
-    tire.castShadow = true;
-    wheelGroup.add(tire);
-
-    // Forged Metallic Rim
-    const rimGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.2, 20);
-    const rimMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.95, roughness: 0.1 });
-    const rim = new THREE.Mesh(rimGeo, rimMat);
-    rim.rotation.x = Math.PI / 2;
-    wheelGroup.add(rim);
-    rimMaterials.push(rimMat);
-
-    // Red Sport Calipers
-    const caliperGeo = new THREE.BoxGeometry(0.1, 0.18, 0.12);
-    const caliperMat = new THREE.MeshStandardMaterial({ color: appState.caliperColor });
-    const caliper = new THREE.Mesh(caliperGeo, caliperMat);
-    caliper.position.set(0.12, 0, 0);
-    wheelGroup.add(caliper);
-    caliperMaterials.push(caliperMat);
-
-    currentCarGroup.add(wheelGroup);
-  });
-
-  // LED Headlights with Light Beams
-  const lightGeo = new THREE.SphereGeometry(0.08, 16, 16);
-  const lightMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-  
-  const headlightL = new THREE.Mesh(lightGeo, lightMat);
-  headlightL.position.set(2.05, 0.6, 0.6);
-  const headlightR = headlightL.clone();
-  headlightR.position.z = -0.6;
-
-  const spotL = new THREE.SpotLight(0xffffff, 3, 10, Math.PI / 6, 0.5);
-  spotL.position.copy(headlightL.position);
-  spotL.target.position.set(6, 0, 0.6);
-  
-  currentCarGroup.add(headlightL, headlightR, spotL, spotL.target);
-  headLights.push(spotL);
-
-  // Underglow Lighting
-  underglowLight = new THREE.PointLight(appState.underglowColor, 0, 5);
-  underglowLight.position.set(0, 0.1, 0);
-  currentCarGroup.add(underglowLight);
-
-  scene.add(currentCarGroup);
-}
-
-function getRealisticPaintMaterial() {
-  let roughness = 0.2;
-  let metalness = 0.8;
-
-  if (appState.paintFinish === 'matte') {
-    roughness = 0.8;
-    metalness = 0.2;
-  } else if (appState.paintFinish === 'chrome') {
-    roughness = 0.05;
-    metalness = 1.0;
-  } else if (appState.paintFinish === 'gloss') {
-    roughness = 0.1;
-    metalness = 0.3;
+  if (currentCarModel) {
+    scene.remove(currentCarModel);
+    currentCarModel = null;
   }
 
-  return new THREE.MeshStandardMaterial({
+  carBodyMeshes = [];
+  rimMeshes = [];
+
+  gltfLoader.load(
+    modelInfo.url,
+    (gltf) => {
+      currentCarModel = gltf.scene;
+
+      // მოდელის ზომის და პოზიციის ავტომატური კორექტირება
+      const box = new THREE.Box3().setFromObject(currentCarModel);
+      const size = box.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 4.2 / maxDim;
+      currentCarModel.scale.set(scale, scale, scale);
+
+      box.setFromObject(currentCarModel);
+      currentCarModel.position.x = -box.getCenter(new THREE.Vector3()).x;
+      currentCarModel.position.y = -box.min.y;
+      currentCarModel.position.z = -box.getCenter(new THREE.Vector3()).z;
+
+      // 3D მოდელის დეტალებისა და მასალების დამუშავება
+      currentCarModel.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+
+          const matName = child.material.name ? child.material.name.toLowerCase() : '';
+          const meshName = child.name ? child.name.toLowerCase() : '';
+
+          // ავტომობილის კორპუსის საღებავის PBR მასალით ჩანაცვლება
+          if (matName.includes('body') || matName.includes('paint') || matName.includes('car_body') || matName.includes('red') || meshName.includes('body')) {
+            child.material = getRealisticCarPaintMaterial();
+            carBodyMeshes.push(child);
+          } else if (matName.includes('glass') || meshName.includes('glass')) {
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0x111111,
+              metalness: 0.1,
+              roughness: 0.05,
+              transmission: 0.85,
+              opacity: 0.8,
+              transparent: true
+            });
+          } else if (matName.includes('rim') || matName.includes('wheel') || meshName.includes('rim')) {
+            rimMeshes.push(child);
+          }
+        }
+      });
+
+      scene.add(currentCarModel);
+      controls.target.set(0, 0.6, 0);
+    },
+    undefined,
+    (error) => {
+      console.error('Error loading 3D GLTF model:', error);
+    }
+  );
+}
+
+// რეალისტური ლაქ-საღებავის მასალა (Clearcoat & Metallic)
+function getRealisticCarPaintMaterial() {
+  let roughness = 0.15;
+  let metalness = 0.85;
+  let clearcoat = 1.0;
+  let clearcoatRoughness = 0.03;
+
+  if (appState.paintFinish === 'matte') {
+    roughness = 0.75;
+    metalness = 0.2;
+    clearcoat = 0.0;
+  } else if (appState.paintFinish === 'chrome') {
+    roughness = 0.02;
+    metalness = 1.0;
+    clearcoat = 1.0;
+  } else if (appState.paintFinish === 'gloss') {
+    roughness = 0.05;
+    metalness = 0.3;
+    clearcoat = 1.0;
+  }
+
+  return new THREE.MeshPhysicalMaterial({
     color: appState.paintColor,
+    metalness: metalness,
     roughness: roughness,
-    metalness: metalness
+    clearcoat: clearcoat,
+    clearcoatRoughness: clearcoatRoughness,
+    reflectivity: 1.0
+  });
+}
+
+function updatePaintColor() {
+  carBodyMeshes.forEach(mesh => {
+    mesh.material = getRealisticCarPaintMaterial();
   });
 }
 
@@ -251,10 +229,8 @@ function animate() {
   requestAnimationFrame(animate);
   controls.update();
 
-  if (appState.engineRunning) {
-    currentCarGroup.position.y = Math.sin(Date.now() * 0.06) * 0.003;
-  } else {
-    currentCarGroup.position.y = 0;
+  if (appState.engineRunning && currentCarModel) {
+    currentCarModel.position.y = (Math.sin(Date.now() * 0.08) * 0.002);
   }
 
   renderer.render(scene, camera);
@@ -267,7 +243,7 @@ function onWindowResize() {
   renderer.setSize(container.clientWidth, container.clientHeight);
 }
 
-// UI EVENT LISTENERS
+// UI EVENTS
 function setupUI() {
   document.querySelectorAll('.acc-header').forEach(header => {
     header.addEventListener('click', () => {
@@ -278,19 +254,36 @@ function setupUI() {
   document.getElementById('btn-3d-lab').addEventListener('click', () => switchView('view-3d-lab'));
   document.getElementById('btn-community').addEventListener('click', () => switchView('view-community'));
 
+  // Car model selection
+  document.querySelectorAll('.car-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.car-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const modelKey = card.dataset.model;
+      appState.currentModel = modelKey;
+      loadCarModel(modelKey);
+    });
+  });
+
+  document.getElementById('carModelSelect').addEventListener('change', (e) => {
+    const modelKey = e.target.value;
+    appState.currentModel = modelKey;
+    loadCarModel(modelKey);
+  });
+
   // Color Swatches
   document.querySelectorAll('.swatch').forEach(swatch => {
     swatch.addEventListener('click', () => {
       document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
       swatch.classList.add('active');
-      appState.paintColor = swatch.dataset.color;
-      updateCarMaterials();
+      appState.paintColor = parseInt(swatch.dataset.color.replace('#', '0x'));
+      updatePaintColor();
     });
   });
 
   document.getElementById('customColorPicker').addEventListener('input', (e) => {
-    appState.paintColor = e.target.value;
-    updateCarMaterials();
+    appState.paintColor = parseInt(e.target.value.replace('#', '0x'));
+    updatePaintColor();
   });
 
   // Finish Types
@@ -299,7 +292,7 @@ function setupUI() {
       document.querySelectorAll('#finishTypeGroup .group-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       appState.paintFinish = btn.dataset.finish;
-      buildProceduralRealisticCar();
+      updatePaintColor();
     });
   });
 
@@ -309,34 +302,27 @@ function setupUI() {
       document.querySelectorAll('[data-rim]').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       appState.rimsPrice = parseInt(card.dataset.price);
-      const color = card.dataset.rim === 'bbs' ? 0xffd700 : 0xdddddd;
-      rimMaterials.forEach(m => m.color.setHex(color));
-      updateTotalPrice();
-    });
-  });
 
-  // Caliper Colors
-  document.querySelectorAll('.caliper-dot').forEach(dot => {
-    dot.addEventListener('click', () => {
-      document.querySelectorAll('.caliper-dot').forEach(d => d.classList.remove('active'));
-      dot.classList.add('active');
-      appState.caliperColor = dot.dataset.caliper;
-      caliperMaterials.forEach(m => m.color.set(appState.caliperColor));
+      const color = card.dataset.rim === 'bbs' ? 0xffd700 : 0xdddddd;
+      rimMeshes.forEach(mesh => {
+        if (mesh.material) mesh.material.color.setHex(color);
+      });
+      updateTotalPrice();
     });
   });
 
   // Neon Underglow
   document.getElementById('toggleUnderglow').addEventListener('change', (e) => {
     appState.underglow = e.target.checked;
-    underglowLight.intensity = appState.underglow ? 4 : 0;
+    underglowLight.intensity = appState.underglow ? 5 : 0;
   });
 
   document.getElementById('underglowPicker').addEventListener('input', (e) => {
-    appState.underglowColor = e.target.value;
-    underglowLight.color.set(appState.underglowColor);
+    appState.underglowColor = parseInt(e.target.value.replace('#', '0x'));
+    underglowLight.color.setHex(appState.underglowColor);
   });
 
-  // Engine Start Audio / Animation
+  // Engine Start Toggle
   const engineBtn = document.getElementById('btnEngineSound');
   engineBtn.addEventListener('click', () => {
     appState.engineRunning = !appState.engineRunning;
@@ -345,17 +331,13 @@ function setupUI() {
   });
 
   document.getElementById('btnResetView').addEventListener('click', () => {
-    camera.position.set(4, 1.8, 4.5);
+    camera.position.set(4.2, 1.6, 4.5);
     controls.target.set(0, 0.6, 0);
   });
 
   document.getElementById('openCartBtn').addEventListener('click', openCartModal);
   document.getElementById('closeCartBtn').addEventListener('click', closeCartModal);
   document.getElementById('closeCartBtn2').addEventListener('click', closeCartModal);
-}
-
-function updateCarMaterials() {
-  carBodyMaterials.forEach(m => m.color.set(appState.paintColor));
 }
 
 function switchView(viewId) {
