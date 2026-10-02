@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MODS·GE — 3D ტიუნინგი</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="mods.css">
 </head>
 <body>
+<div id="err" hidden></div>
+<script>addEventListener("error",function(e){var b=document.getElementById("err");b.hidden=false;var t=e.target;b.textContent=(t&&t.src)?"ვერ ჩაიტვირთა: "+t.src:"შეცდომა: "+e.message+" ("+String(e.filename||"").split("/").pop()+":"+e.lineno+")";},true);</script>
 <header class="top">
   <button class="logo" data-go="home" aria-label="მთავარი"><b>MODS</b><i>GE</i></button>
   <nav id="nav">
@@ -52,6 +54,6 @@
   </section>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="script.js"></script>
+<script src="mods.js"></script>
 </body>
 </html>
