@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ტიუნინგ სტუდია 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <div class="stage" id="stage">
+    <canvas id="c" aria-label="მანქანის 3D მოდელი"></canvas>
+    <div class="brand">ტიუნინგ სტუდია</div>
+    <div class="hint">გადაატრიალე გადათრევით, მასშტაბი — ბორბლით</div>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+  <aside class="panel">
+    <h2>ავტომატური სტილი</h2>
+    <div class="row pre" id="pre">
+      <button data-p="jdm">JDM</button><button data-p="stance">სტენსი</button><button data-p="drift">დრიფტი</button><button data-p="muscle">მასლი</button><button data-p="rand">შემთხვევითი</button>
+    </div>
+    <h2>ძარის ფერი</h2>
+    <div class="row" id="colors"></div>
+    <div class="row" style="margin-top:10px"><input type="color" id="cc" aria-label="საკუთარი ფერი"><span class="mute">საკუთარი ფერი</span></div>
+    <h2>ლაქის ტიპი</h2>
+    <div class="row seg" id="fin"><button data-f="matte">მქრქალი</button><button data-f="gloss">მბზინავი</button><button data-f="metal">მეტალიკი</button></div>
+    <h2>დისკები</h2>
+    <div class="row" id="rims"></div>
+    <div class="row seg" id="spk" style="margin-top:10px"><button data-s="5">5 სხივი</button><button data-s="6">6 სხივი</button><button data-s="10">10 სხივი</button></div>
+    <div class="lab">დისკის ზომა</div>
+    <input type="range" id="ws" min="0.85" max="1.1" step="0.01" aria-label="დისკის ზომა">
+    <h2>სამუხრუჭე კალიპერი</h2>
+    <div class="row" id="cal"></div>
+    <h2>დაშვება</h2>
+    <input type="range" id="rd" min="-0.06" max="0.1" step="0.005" aria-label="დაშვება">
+    <h2>დეტალები</h2>
+    <label class="t"><input type="checkbox" id="sp"> უკანა სპოილერი</label>
+    <label class="t"><input type="checkbox" id="kit"> ბოდიკიტი (სპლიტერი, ზღურბლები, დიფუზორი)</label>
+    <label class="t"><input type="checkbox" id="sc"> კაპოტის ჰაერმიმღები</label>
+    <h2>ქვედა განათება</h2>
+    <div class="row"><label class="t" style="margin:0"><input type="checkbox" id="gl"> ჩართვა</label><input type="color" id="gc" aria-label="განათების ფერი"></div>
+    <h2>ფანჯრების ტონირება</h2>
+    <input type="range" id="tn" min="0" max="1" step="0.01" aria-label="ტონირება">
+    <h2>სცენა</h2>
+    <label class="t"><input type="checkbox" id="nt"> ღამის რეჟიმი</label>
+    <h2>ბილდი</h2>
+    <div class="row pre">
+      <button id="save">შენახვა</button><button id="share">ბმულის კოპირება</button><button id="shot">სურათი (PNG)</button><button id="reset">საწყისზე დაბრუნება</button>
+    </div>
+  </aside>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
