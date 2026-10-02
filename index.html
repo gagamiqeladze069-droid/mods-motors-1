@@ -12,36 +12,47 @@
   <div class="stage" id="stage">
     <canvas id="c" aria-label="მანქანის 3D მოდელი"></canvas>
     <div class="brand">ტიუნინგ სტუდია</div>
+    <div class="views seg" id="views"><button data-view="front">წინ</button><button data-view="side">გვერდი</button><button data-view="rear">უკან</button><button data-view="top">ზემოდან</button></div>
     <div class="hint">გადაატრიალე გადათრევით, მასშტაბი — ბორბლით</div>
     <div class="toast" id="toast" role="status"></div>
   </div>
   <aside class="panel">
+    <h2>მანქანის ტიპი</h2>
+    <div class="row seg" id="mdl"></div>
     <h2>ავტომატური სტილი</h2>
     <div class="row pre" id="pre">
-      <button data-p="jdm">JDM</button><button data-p="stance">სტენსი</button><button data-p="drift">დრიფტი</button><button data-p="muscle">მასლი</button><button data-p="rand">შემთხვევითი</button>
+      <button data-p="jdm">JDM</button><button data-p="stance">სტენსი</button><button data-p="drift">დრიფტი</button><button data-p="muscle">მასლი</button><button data-p="street">ქუჩის ჰეჩბეკი</button><button data-p="rand">შემთხვევითი</button>
     </div>
     <h2>ძარის ფერი</h2>
     <div class="row" id="colors"></div>
     <div class="row" style="margin-top:10px"><input type="color" id="cc" aria-label="საკუთარი ფერი"><span class="mute">საკუთარი ფერი</span></div>
     <h2>ლაქის ტიპი</h2>
-    <div class="row seg" id="fin"><button data-f="matte">მქრქალი</button><button data-f="gloss">მბზინავი</button><button data-f="metal">მეტალიკი</button></div>
+    <div class="row seg" id="fin"><button data-v="matte">მქრქალი</button><button data-v="gloss">მბზინავი</button><button data-v="metal">მეტალიკი</button></div>
     <h2>დისკები</h2>
     <div class="row" id="rims"></div>
-    <div class="row seg" id="spk" style="margin-top:10px"><button data-s="5">5 სხივი</button><button data-s="6">6 სხივი</button><button data-s="10">10 სხივი</button></div>
+    <div class="row seg" id="spk" style="margin-top:10px"><button data-v="5">5 სხივი</button><button data-v="6">6 სხივი</button><button data-v="10">10 სხივი</button></div>
     <div class="lab">დისკის ზომა</div>
     <input type="range" id="ws" min="0.85" max="1.1" step="0.01" aria-label="დისკის ზომა">
     <h2>სამუხრუჭე კალიპერი</h2>
     <div class="row" id="cal"></div>
     <h2>დაშვება</h2>
     <input type="range" id="rd" min="-0.06" max="0.1" step="0.005" aria-label="დაშვება">
+    <h2>სპოილერი</h2>
+    <div class="row seg" id="wing"><button data-v="none">არა</button><button data-v="duck">იხვის კუდი</button><button data-v="gt">GT ფრთა</button></div>
+    <h2>კაპოტი</h2>
+    <div class="row seg" id="hood"><button data-v="stock">სტანდარტი</button><button data-v="scoop">ჰაერმიმღები</button><button data-v="carbon">კარბონი</button></div>
     <h2>დეტალები</h2>
-    <label class="t"><input type="checkbox" id="sp"> უკანა სპოილერი</label>
     <label class="t"><input type="checkbox" id="kit"> ბოდიკიტი (სპლიტერი, ზღურბლები, დიფუზორი)</label>
-    <label class="t"><input type="checkbox" id="sc"> კაპოტის ჰაერმიმღები</label>
+    <label class="t"><input type="checkbox" id="wide"> გაფართოებული ფენდერები</label>
+    <label class="t"><input type="checkbox" id="exh"> სპორტული გამონაბოლქვი</label>
+    <h2>ფარების ფერი</h2>
+    <div class="row" id="hl"></div>
     <h2>ქვედა განათება</h2>
     <div class="row"><label class="t" style="margin:0"><input type="checkbox" id="gl"> ჩართვა</label><input type="color" id="gc" aria-label="განათების ფერი"></div>
     <h2>ფანჯრების ტონირება</h2>
     <input type="range" id="tn" min="0" max="1" step="0.01" aria-label="ტონირება">
+    <h2>სახელმწიფო ნომერი</h2>
+    <input type="text" id="pl" maxlength="8" aria-label="ნომერი">
     <h2>სცენა</h2>
     <label class="t"><input type="checkbox" id="nt"> ღამის რეჟიმი</label>
     <h2>ბილდი</h2>
