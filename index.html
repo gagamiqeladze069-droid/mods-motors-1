@@ -12,218 +12,473 @@
 
 <body>
 
-    <header class="navbar">
-        <div class="logo">
-            Auto<span>Verse</span>
+<header class="navbar">
+
+    <div class="logo">
+        AUTO<span>VERSE</span>
+    </div>
+
+    <nav>
+        <a href="#home">HOME</a>
+        <a href="#tuning">TUNING</a>
+        <a href="#specs">SPECS</a>
+    </nav>
+
+    <div class="nav-status">
+        <span class="status-dot"></span>
+        CONFIGURATOR
+    </div>
+
+</header>
+
+
+<main>
+
+    <!-- HERO -->
+
+    <section id="home" class="hero">
+
+        <div class="hero-info">
+
+            <p class="eyebrow">
+                BMW M PERFORMANCE
+            </p>
+
+            <h1>
+                M3
+                <span>COMPETITION</span>
+            </h1>
+
+            <p class="hero-description">
+                Build your own BMW M3 Competition.
+                Customize the exterior and create your own setup.
+            </p>
+
+            <div class="engine-status">
+
+                <div>
+                    <small>ENGINE</small>
+                    <strong id="engineState">OFF</strong>
+                </div>
+
+                <div>
+                    <small>RPM</small>
+                    <strong id="rpmValue">0</strong>
+                </div>
+
+            </div>
+
+            <div class="hero-buttons">
+
+                <button id="engineButton" class="primary-button">
+                    START ENGINE
+                </button>
+
+                <button id="revButton" class="secondary-button">
+                    REV
+                </button>
+
+            </div>
+
         </div>
 
-        <nav>
-            <a href="#home">მთავარი</a>
-            <a href="#cars">მანქანები</a>
-            <a href="#specs">მახასიათებლები</a>
-        </nav>
 
-        <button class="menu-btn">MENU</button>
-    </header>
+        <!-- 3D CAR -->
+
+        <div id="car-container">
+
+            <div class="loading">
+                LOADING 3D CONFIGURATOR...
+            </div>
+
+        </div>
 
 
-    <main id="home">
+        <!-- CAMERA BUTTONS -->
 
-        <section class="hero">
+        <div class="camera-controls">
 
-            <div class="hero-content">
+            <button data-camera="front">
+                FRONT
+            </button>
 
-                <div class="tag">
-                    BMW M PERFORMANCE
+            <button data-camera="side">
+                SIDE
+            </button>
+
+            <button data-camera="rear">
+                REAR
+            </button>
+
+            <button data-camera="top">
+                TOP
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- TUNING -->
+
+    <section id="tuning" class="section">
+
+        <div class="section-header">
+
+            <div>
+                <p class="section-number">01</p>
+                <h2>TUNING</h2>
+            </div>
+
+            <p>
+                Customize your BMW
+            </p>
+
+        </div>
+
+
+        <div class="tuning-layout">
+
+
+            <!-- TUNING MENU -->
+
+            <aside class="tuning-menu">
+
+
+                <div class="tuning-group">
+
+                    <h3>PAINT</h3>
+
+                    <div class="color-options">
+
+                        <button
+                            class="color-option active"
+                            data-color="#171717"
+                            style="background:#171717">
+                        </button>
+
+                        <button
+                            class="color-option"
+                            data-color="#eeeeee"
+                            style="background:#eeeeee">
+                        </button>
+
+                        <button
+                            class="color-option"
+                            data-color="#143d8f"
+                            style="background:#143d8f">
+                        </button>
+
+                        <button
+                            class="color-option"
+                            data-color="#790f16"
+                            style="background:#790f16">
+                        </button>
+
+                        <button
+                            class="color-option"
+                            data-color="#555555"
+                            style="background:#555555">
+                        </button>
+
+                    </div>
+
                 </div>
 
-                <h1>
-                    BMW M3
-                    <span>COMPETITION</span>
-                </h1>
 
-                <p class="description">
-                    მაღალი წარმადობის სპორტული სედანი,
-                    შექმნილი სიჩქარისა და მართვისთვის.
-                </p>
+                <div class="tuning-group">
 
-                <div class="buttons">
+                    <h3>WHEELS</h3>
 
-                    <button id="startBtn" class="start-btn">
-                        <span class="power-icon">⏻</span>
-                        ENGINE START
+                    <button class="option active" data-wheel="stock">
+                        <span>01</span>
+                        STOCK
                     </button>
 
-                    <button id="lightsBtn" class="secondary-btn">
-                        LIGHTS
+                    <button class="option" data-wheel="sport">
+                        <span>02</span>
+                        SPORT
+                    </button>
+
+                    <button class="option" data-wheel="racing">
+                        <span>03</span>
+                        RACING
+                    </button>
+
+                    <button class="option" data-wheel="forged">
+                        <span>04</span>
+                        FORGED
                     </button>
 
                 </div>
 
-                <div id="engineStatus" class="status">
-                    ENGINE OFF
-                </div>
 
-            </div>
+                <div class="tuning-group">
 
+                    <h3>SPOILER</h3>
 
-            <div class="car-area">
+                    <button class="option active" data-spoiler="none">
+                        <span>01</span>
+                        NONE
+                    </button>
 
-                <div class="glow"></div>
+                    <button class="option" data-spoiler="performance">
+                        <span>02</span>
+                        M PERFORMANCE
+                    </button>
 
-                <img
-                    id="carImage"
-                    class="car-image"
-                    src="https://commons.wikimedia.org/wiki/Special:Redirect/file/The%20frontview%20of%20BMW%20M3%20Competition%20M%20xDrive%20%28G80%29.jpg"
-                    alt="BMW M3 Competition G80"
-                >
-
-                <div class="rpm-box">
-
-                    <div class="rpm-title">
-                        RPM
-                    </div>
-
-                    <div id="rpm">
-                        0
-                    </div>
-
-                    <div class="rpm-line">
-                        <span id="rpmBar"></span>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <section id="specs" class="spec-section">
-
-            <div class="section-title">
-
-                <span>01</span>
-
-                <h2>
-                    ENGINE
-                </h2>
-
-            </div>
-
-
-            <div class="spec-container">
-
-                <div class="engine-card">
-
-                    <div class="engine-label">
-                        POWER UNIT
-                    </div>
-
-                    <h3>
-                        3.0L
-                    </h3>
-
-                    <p>
-                        Twin-Turbo Inline-6
-                    </p>
-
-                    <div class="cylinders">
-                        <div class="cylinder-dot active"></div>
-                        <div class="cylinder-dot active"></div>
-                        <div class="cylinder-dot active"></div>
-                        <div class="cylinder-dot active"></div>
-                        <div class="cylinder-dot active"></div>
-                        <div class="cylinder-dot active"></div>
-                    </div>
-
-                    <strong>
-                        6 CYLINDERS
-                    </strong>
+                    <button class="option" data-spoiler="gt">
+                        <span>03</span>
+                        GT WING
+                    </button>
 
                 </div>
 
 
-                <div class="stats">
+                <div class="tuning-group">
 
-                    <div class="stat">
+                    <h3>FRONT BUMPER</h3>
+
+                    <button class="option active" data-bumper="stock">
+                        <span>01</span>
+                        STOCK
+                    </button>
+
+                    <button class="option" data-bumper="sport">
+                        <span>02</span>
+                        SPORT
+                    </button>
+
+                    <button class="option" data-bumper="aggressive">
+                        <span>03</span>
+                        AGGRESSIVE
+                    </button>
+
+                </div>
+
+
+                <div class="tuning-group">
+
+                    <h3>EXHAUST</h3>
+
+                    <button class="option active" data-exhaust="stock">
+                        <span>01</span>
+                        STOCK
+                    </button>
+
+                    <button class="option" data-exhaust="sport">
+                        <span>02</span>
+                        SPORT
+                    </button>
+
+                    <button class="option" data-exhaust="titanium">
+                        <span>03</span>
+                        TITANIUM
+                    </button>
+
+                    <button class="option" data-exhaust="racing">
+                        <span>04</span>
+                        RACING
+                    </button>
+
+                </div>
+
+
+                <div class="tuning-group">
+
+                    <h3>SUSPENSION</h3>
+
+                    <input
+                        id="suspension"
+                        type="range"
+                        min="0"
+                        max="3"
+                        value="0">
+
+                    <div class="range-labels">
+                        <span>STOCK</span>
+                        <span>LOW</span>
+                    </div>
+
+                </div>
+
+
+                <button id="resetButton" class="reset-button">
+                    RESET BUILD
+                </button>
+
+            </aside>
+
+
+            <!-- LIVE BUILD INFO -->
+
+            <div class="build-panel">
+
+                <div class="build-title">
+                    <p>CURRENT BUILD</p>
+                    <h2>BMW M3 COMPETITION</h2>
+                </div>
+
+
+                <div class="build-items">
+
+                    <div>
+                        <span>PAINT</span>
+                        <strong id="paintName">BLACK</strong>
+                    </div>
+
+                    <div>
+                        <span>WHEELS</span>
+                        <strong id="wheelName">STOCK</strong>
+                    </div>
+
+                    <div>
+                        <span>SPOILER</span>
+                        <strong id="spoilerName">NONE</strong>
+                    </div>
+
+                    <div>
+                        <span>FRONT</span>
+                        <strong id="bumperName">STOCK</strong>
+                    </div>
+
+                    <div>
+                        <span>EXHAUST</span>
+                        <strong id="exhaustName">STOCK</strong>
+                    </div>
+
+                    <div>
+                        <span>RIDE HEIGHT</span>
+                        <strong id="heightName">STOCK</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="build-performance">
+
+                    <p>PERFORMANCE</p>
+
+                    <div class="performance-row">
+
                         <span>POWER</span>
-                        <strong>503 HP</strong>
+
+                        <div class="bar">
+                            <i id="powerBar"></i>
+                        </div>
+
+                        <strong id="powerValue">
+                            503 HP
+                        </strong>
+
                     </div>
 
-                    <div class="stat">
+
+                    <div class="performance-row">
+
                         <span>TORQUE</span>
-                        <strong>650 Nm</strong>
-                    </div>
 
-                    <div class="stat">
-                        <span>TRANSMISSION</span>
-                        <strong>8-SPEED</strong>
-                    </div>
+                        <div class="bar">
+                            <i id="torqueBar"></i>
+                        </div>
 
-                    <div class="stat">
-                        <span>DRIVE</span>
-                        <strong>M xDRIVE</strong>
+                        <strong id="torqueValue">
+                            650 Nm
+                        </strong>
+
                     </div>
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
+
+    </section>
 
 
-        <section id="cars" class="cars-section">
+    <!-- SPECS -->
 
-            <div class="section-title">
+    <section id="specs" class="section specs-section">
 
-                <span>02</span>
+        <div class="section-header">
 
-                <h2>
-                    SELECT CAR
-                </h2>
-
+            <div>
+                <p class="section-number">02</p>
+                <h2>SPECIFICATIONS</h2>
             </div>
 
+        </div>
 
-            <div class="car-selector">
 
-                <button class="car-option active">
-                    BMW M3
-                    <small>COMPETITION</small>
-                </button>
+        <div class="spec-grid">
 
-                <button class="car-option">
-                    BMW M4
-                    <small>COMING SOON</small>
-                </button>
-
-                <button class="car-option">
-                    BMW M5
-                    <small>COMING SOON</small>
-                </button>
-
+            <div class="spec-card">
+                <span>ENGINE</span>
+                <strong>3.0L</strong>
+                <small>TWIN-TURBO INLINE-6</small>
             </div>
 
-        </section>
+            <div class="spec-card">
+                <span>CYLINDERS</span>
+                <strong>6</strong>
+                <small>INLINE CONFIGURATION</small>
+            </div>
 
-    </main>
+            <div class="spec-card">
+                <span>POWER</span>
+                <strong>503 HP</strong>
+                <small>COMPETITION</small>
+            </div>
+
+            <div class="spec-card">
+                <span>TORQUE</span>
+                <strong>650 Nm</strong>
+                <small>PEAK TORQUE</small>
+            </div>
+
+            <div class="spec-card">
+                <span>TRANSMISSION</span>
+                <strong>8</strong>
+                <small>SPEED AUTOMATIC</small>
+            </div>
+
+            <div class="spec-card">
+                <span>DRIVE</span>
+                <strong>M xDRIVE</strong>
+                <small>AWD</small>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
 
 
-    <footer>
+<footer>
 
-        <p>
-            AutoVerse © 2026
-        </p>
+    <strong>AUTOVERSE</strong>
 
-        <p>
-            BMW M3 Competition Experience
-        </p>
+    <span>
+        BMW M3 COMPETITION CONFIGURATOR
+    </span>
 
-    </footer>
+</footer>
 
 
-    <script src="script.js"></script>
+<!-- THREE.JS -->
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
